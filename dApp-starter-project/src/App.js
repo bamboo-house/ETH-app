@@ -8,7 +8,7 @@ const App = () => {
   // ユーザーのパブリックウォレットを保存するために使用する状態変数を定義する
   const [currentAccount, setCurrentAccount] = useState("");
   // デプロイされたコントラクトのアドレスを保持する変数を作成
-  const contractAddress = "0x2729499Fa35Df456367e28B40437346259B4867B";
+  const contractAddress = "0xc628BF6f57CF29Cd79BD4f80c36Ca0391D40fB34";
   // ABIの内容を参照する変数を作成
   const contractABI = abi.abi;
   // 全てのwavesを保存する状態変数を定義
