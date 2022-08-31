@@ -1,4 +1,2 @@
 # ETH-app
-
-test
-tesuto
+Solidityによるコントラクト作成とReactによる掲示板アプリケーションの構築
