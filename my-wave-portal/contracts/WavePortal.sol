@@ -25,7 +25,6 @@ contract WavePortal {
       console.log("WavePortal - Smart Contract!");
     }
 
-
     // _messageという文字列を要求するようにwave関数を更新。
     // _messageは、ユーザーがフロントエンドから受信するメッセージです。
     function wave(string memory _message) public {
