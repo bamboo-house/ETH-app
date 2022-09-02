@@ -14,26 +14,25 @@ const App = () => {
 
   console.log("currentAccount: ", currentAccount);
   // デプロイされたコントラクトのアドレスを保持する変数を作成
-  const contractAddress = "0xc628BF6f57CF29Cd79BD4f80c36Ca0391D40fB34";
+  const contractAddress = "0xdB37B590e02EEbfb2cA33bE22D7369DAA4887193";
   // ABIの内容を参照する変数を作成
   const contractABI = abi.abi;
 
   const getAllWaves = async () => {
-    const {ethereum } = window;
-
+    const { ethereum } = window;
+  
     try {
       if (ethereum) {
         const provider = new ethers.providers.Web3Provider(ethereum);
-        const siger = provider.getSigner();
+        const signer = provider.getSigner();
         const wavePortalContract = new ethers.Contract(
           contractAddress,
           contractABI,
-          siger
+          signer
         );
-
-        // コントラクトからgetAllWavesメソッドを呼び出す
+        /* コントラクトからgetAllWavesメソッドを呼び出す */
         const waves = await wavePortalContract.getAllWaves();
-        // UIに必要なのは、アドレス、タイムスタンプ、メッセージだけなので、以下のように設定
+        /* UIに必要なのは、アドレス、タイムスタンプ、メッセージだけなので、以下のように設定 */
         const wavesCleaned = waves.map((wave) => {
           return {
             address: wave.waver,
@@ -41,7 +40,8 @@ const App = () => {
             message: wave.message,
           };
         });
-        // React Stateにデータを格納する
+  
+        /* React Stateにデータを格納する */
         setAllWaves(wavesCleaned);
       } else {
         console.log("Ethereum object doesn't exist!");
@@ -50,11 +50,13 @@ const App = () => {
       console.log(error);
     }
   };
-
-  // emitされたイベントに反応する
+  
+  /**
+   * `emit`されたイベントに反応する
+   */
   useEffect(() => {
     let wavePortalContract;
-
+  
     const onNewWave = (from, timestamp, message) => {
       console.log("NewWave", from, timestamp, message);
       setAllWaves((prevState) => [
@@ -66,24 +68,22 @@ const App = () => {
         },
       ]);
     };
-
-    // NewWaveイベントがコントラクトから発信されたときに、情報を受け取る
+  
+    /* NewWaveイベントがコントラクトから発信されたときに、情報を受け取ります */
     if (window.ethereum) {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
-
+  
       wavePortalContract = new ethers.Contract(
         contractAddress,
         contractABI,
-        signer,
+        signer
       );
-      // コンポーネント（情報）がマウント（フロントエンドに反映）される
       wavePortalContract.on("NewWave", onNewWave);
     }
-
-    // メモリリークを防ぐために、NewWaveのイベントを解除する
+    /*メモリリークを防ぐために、NewWaveのイベントを解除します*/
     return () => {
-      if(wavePortalContract) {
+      if (wavePortalContract) {
         wavePortalContract.off("NewWave", onNewWave);
       }
     };
