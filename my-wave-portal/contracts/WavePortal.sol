@@ -24,6 +24,9 @@ contract WavePortal {
   // 構造体の配列を格納するための変数wavesを宣言。これで、ユーザーが送ってきた全ての「wave」を保持することができる。
   Wave[] waves;
 
+  // "address => uint mapping"は、アドレスと数値を関連づける
+  mapping(address => uint256) public lastWavedAt;
+
   constructor() payable {
     console.log("We have been constructed!");
 
@@ -34,6 +37,15 @@ contract WavePortal {
   // _messageという文字列を要求するようにwave関数を更新。
   // _messageは、ユーザーがフロントエンドから受信するメッセージです。
   function wave(string memory _message) public {
+    // 現在のユーザーがwaveを送信している時刻と、前回waveを送信した時刻が15分以上離れていることを確認
+    require(
+      lastWavedAt[msg.sender] + 15 minutes < block.timestamp,
+      "Wait 15m"
+    );
+
+    // ユーザーの現在のタイムスタンプを更新する
+    lastWavedAt[msg.sender] = block.timestamp;
+
     totalWaves += 1;
     console.log("%s waved w/ message %s", msg.sender, _message);
     /*
