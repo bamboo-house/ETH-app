@@ -8,6 +8,9 @@ import "hardhat/console.sol";
 contract WavePortal {
   uint256 totalWaves;
 
+  // 乱数生成のための基盤となるシード（種）を作成
+  uint256 private seed;
+
   // NewWaveイベントの作成
   event NewWave(address indexed from, uint256 timestamp, string messaage);
 
@@ -23,6 +26,9 @@ contract WavePortal {
 
   constructor() payable {
     console.log("We have been constructed!");
+
+    // 初期シードを設定
+    seed = (block.timestamp + block.difficulty) % 100;
   }
 
   // _messageという文字列を要求するようにwave関数を更新。
@@ -34,20 +40,31 @@ contract WavePortal {
     * 「👋（wave）」とメッセージを配列に格納。
     */
     waves.push(Wave(msg.sender, _message, block.timestamp));
+
+    // ユーザーのために乱数を生成
+    seed = (block.difficulty + block.timestamp + seed) % 100;
+    console.log("Random # generated: %d", seed);
+
+    if (seed <= 50) {
+      console.log("%s won!", msg.sender);
+
+      /*
+      * 「👋（wave）」を送ってくれたユーザーに0.0001ETHを送る
+      */
+      uint256 prizeAmount = 0.0001 ether;
+      require(
+        prizeAmount <= address(this).balance,
+        "Trying to withdraw more money than the contract has."
+      );
+      (bool success, ) = (msg.sender).call{value: prizeAmount}("");
+      require(success, "Failed to withdraw money from contract.");
+    } else {
+      console.log("%s did not win.", msg.sender);
+    }
     /*
     * コントラクト側でemitされたイベントに関する通知をフロントエンドで取得できるようにする。
     */
     emit NewWave(msg.sender, block.timestamp, _message);
-    /*
-    * 「👋（wave）」を送ってくれたユーザーに0.0001ETHを送る
-    */
-    uint256 prizeAmount = 0.0001 ether;
-    require(
-      prizeAmount <= address(this).balance,
-      "Trying to withdraw more money than the contract has."
-    );
-    (bool success, ) = (msg.sender).call{value: prizeAmount}("");
-    require(success, "Failed to withdraw money from contract.");
   }
 
 
